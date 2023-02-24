@@ -76,6 +76,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.web.cors.CorsConfiguration;
+import ca.uhn.fhir.jpa.starter.RequestCounterInterceptor;
+import ca.uhn.fhir.jpa.starter.SimpleServerLogging;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -184,6 +186,7 @@ public class StarterJpaConfig {
 		loggingInterceptor.setMessageFormat(appProperties.getLogger().getFormat());
 		loggingInterceptor.setErrorMessageFormat(appProperties.getLogger().getError_format());
 		loggingInterceptor.setLogExceptions(appProperties.getLogger().getLog_exceptions());
+		ourLog.info("Logging");
 		return loggingInterceptor;
 	}
 
@@ -296,6 +299,8 @@ public class StarterJpaConfig {
 		 * browser.
 		 */
 		fhirServer.registerInterceptor(new ResponseHighlighterInterceptor());
+		fhirServer.registerInterceptor(new RequestCounterInterceptor());
+		
 
 		if (appProperties.getFhirpath_interceptor_enabled()) {
 			fhirServer.registerInterceptor(new FhirPathFilterInterceptor());
@@ -410,7 +415,7 @@ public class StarterJpaConfig {
 		// register custom interceptors
 		registerCustomInterceptors(fhirServer, appContext, appProperties.getCustomInterceptorClasses());
 
-
+		fhirServer.registerInterceptor(new SimpleServerLogging());
 		//register the IPS Provider
 		if (!theIpsOperationProvider.isEmpty()) {
 			fhirServer.registerProvider(theIpsOperationProvider.get());

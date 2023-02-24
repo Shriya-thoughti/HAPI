@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+//import ca.uhn.fhir.jpa.starter.SimpleRestfulServer;
 @ServletComponentScan(basePackageClasses = {RestfulServer.class})
 @SpringBootApplication(exclude = {ElasticsearchRestClientAutoConfiguration.class})
 @Import({
@@ -54,6 +55,8 @@ public class Application extends SpringBootServletInitializer {
 
   @Autowired
   AutowireCapableBeanFactory beanFactory;
+ // @Autowired
+ // SimpleRestfulServer restfulServer;
 
   @Bean
   @Conditional(OnEitherVersion.class)
@@ -65,6 +68,7 @@ public class Application extends SpringBootServletInitializer {
     servletRegistrationBean.setLoadOnStartup(1);
 
     return servletRegistrationBean;
+	
   }
 
   @Bean
