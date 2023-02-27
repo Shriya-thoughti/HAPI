@@ -25,7 +25,7 @@ public class SimpleServerLogging {
 	   @Hook(Pointcut.SERVER_OUTGOING_RESPONSE)
 	   public void logRequests1(ResponseDetails theResponse) {
 		   ourLog.info("OUTGOING RESPONSE");
-	      ourLog.info("Request of type {} with" ,theResponse.getResponseCode());
+	      ourLog.info("Response of status code {}" ,theResponse.getResponseCode());
 	   }
 	   
 	   @Hook(Pointcut.STORAGE_PRESTORAGE_RESOURCE_CREATED)
