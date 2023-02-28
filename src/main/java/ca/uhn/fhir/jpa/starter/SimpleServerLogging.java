@@ -28,12 +28,14 @@ public class SimpleServerLogging {
 	      ourLog.info("Response of status code {}" ,theResponse.getResponseCode());
 	   }
 	   
-	   @Hook(Pointcut.STORAGE_PRESTORAGE_RESOURCE_CREATED)
-	   public void insert(IBaseResource theResource) {
-		   System.out.println("RESOURCE CREATED");
-	      System.out.println(theResource.getMeta().getVersionId());
-	      
+	   @Hook(Pointcut.STORAGE_PRECOMMIT_RESOURCE_CREATED)
+	   public void insert(IBaseResource theResource,ResponseDetails theResponse1) {
+		   System.out.println("RESOURCE LASTLY UPDATED");
+	      System.out.println(theResource.getMeta().getLastUpdated());
+	    
+	     
 	   }
+	  
 
 
 }
