@@ -40,6 +40,9 @@ import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.jpa.search.IStaleSearchDeletingSvc;
 import ca.uhn.fhir.jpa.search.StaleSearchDeletingSvcImpl;
 import ca.uhn.fhir.jpa.starter.AppProperties;
+import ca.uhn.fhir.jpa.starter.BasicAuthorizationInterceptor;
+import ca.uhn.fhir.jpa.starter.CapabilityStatementInterceptor;
+import ca.uhn.fhir.jpa.starter.PatientAdminAuthorization;
 import ca.uhn.fhir.jpa.starter.annotations.OnCorsPresent;
 import ca.uhn.fhir.jpa.starter.annotations.OnImplementationGuidesPresent;
 import ca.uhn.fhir.jpa.starter.common.validation.IRepositoryValidationInterceptorFactory;
@@ -65,6 +68,8 @@ import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import org.hl7.fhir.common.hapi.validation.support.CachingValidationSupport;
+import org.hl7.fhir.instance.model.api.IBaseConformance;
+import org.hl7.fhir.r4.model.CapabilityStatement;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -266,7 +271,9 @@ public class StarterJpaConfig {
 		fhirServer.registerProviders(resourceProviderFactory.createProviders());
 		fhirServer.registerProvider(jpaSystemProvider);
 		fhirServer.setServerConformanceProvider(calculateConformanceProvider(fhirSystemDao, fhirServer, daoConfig, searchParamRegistry, theValidationSupport));
-
+		//fhirServer.registerInterceptor(new CapabilityStatementInterceptor());
+		
+		
 		/*
 		 * ETag Support
 		 */
@@ -300,6 +307,26 @@ public class StarterJpaConfig {
 		 */
 		fhirServer.registerInterceptor(new ResponseHighlighterInterceptor());
 		fhirServer.registerInterceptor(new RequestCounterInterceptor());
+		//fhirServer.registerInterceptor(new BasicAuthorizationInterceptor());
+		fhirServer.registerInterceptor(new PatientAdminAuthorization());
+		
+		
+		//Registering the CapabilityStatementInterceptor
+	StaticCapabilityStatementInterceptor interceptor1 = new StaticCapabilityStatementInterceptor();
+	     
+	     CapabilityStatement cs = new CapabilityStatement();
+	      interceptor1.setCapabilityStatement(cs);
+	     // interceptor1.setCapabilityStatementResource("/ca/uhn/fhir/jpa/starter/capabilitystatement.json");
+	      cs.setVersion("4.0.1");
+	      cs.getSoftware().setName("My Acme Server");
+		
+		
+	      fhirServer.registerInterceptor(interceptor1);
+
+	      
+	      
+
+		
 		
 
 		if (appProperties.getFhirpath_interceptor_enabled()) {
@@ -475,7 +502,9 @@ public class StarterJpaConfig {
 			return confProvider;
 		} else if (fhirVersion == FhirVersionEnum.R4) {
 
+			
 			JpaCapabilityStatementProvider confProvider = new JpaCapabilityStatementProvider(fhirServer, fhirSystemDao, daoConfig, searchParamRegistry, theValidationSupport);
+			
 			confProvider.setImplementationDescription("HAPI FHIR R4 Server");
 			return confProvider;
 		} else if (fhirVersion == FhirVersionEnum.R4B) {
