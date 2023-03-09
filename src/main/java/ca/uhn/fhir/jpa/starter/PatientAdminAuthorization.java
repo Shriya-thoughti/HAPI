@@ -3,7 +3,11 @@ package ca.uhn.fhir.jpa.starter;
 
 import java.util.List;
 
+import org.hl7.fhir.r4.model.CarePlan;
+import org.hl7.fhir.r4.model.CareTeam;
 import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Person;
 
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -29,7 +33,7 @@ public class PatientAdminAuthorization extends AuthorizationInterceptor {
       boolean userIsAdmin = false;
       String authHeader = theRequestDetails.getHeader("Authorization");
       if ("Bearer dfw98h38r".equals(authHeader)) {
-         // This user has access only to Patient/1 resources
+         
          userIdPatientId = new IdType("Patient", 902L);
       } else if ("Bearer 39ff939jgg".equals(authHeader)) {
          // This user has access to everything
@@ -45,8 +49,17 @@ public class PatientAdminAuthorization extends AuthorizationInterceptor {
       // If a client request doesn't pass either of the above, deny it
       if (userIdPatientId != null) {
          return new RuleBuilder()
-            .allow().read().allResources().inCompartment("Patient", userIdPatientId).andThen()
-            .allow().write().allResources().inCompartment("Patient", userIdPatientId).andThen()
+            //.allow().read().allResources().inCompartment("Patient", userIdPatientId).andThen()
+        	// .allow().write().allResources().inCompartment("Patient", userIdPatientId).andThen()
+            .allow().read().resourcesOfType(CareTeam.class).withAnyId().andThen()
+            .allow().read().resourcesOfType(CarePlan.class).withAnyId().andThen()
+            .allow().read().resourcesOfType(Person.class).withAnyId().andThen()
+            .allow().write().resourcesOfType(CareTeam.class).withAnyId().andThen()
+            .allow().write().resourcesOfType(CarePlan.class).withAnyId().andThen()
+            .allow().write().resourcesOfType(Person.class).withAnyId().andThen()
+          //  .allow().patch().resourcesOfType(CareTeam.class).withAnyId().andThen()
+            
+          
             .denyAll()
             .build();
       }
